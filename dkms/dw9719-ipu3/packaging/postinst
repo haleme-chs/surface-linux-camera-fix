@@ -1,0 +1,55 @@
+#!/bin/sh
+set -e
+
+NAME=dw9719-ipu3
+VERSION=1.4
+
+if [ "$1" = configure ]; then
+	if [ ! -d "/lib/modules/$(uname -r)/build" ]; then
+		echo "linux-headers-$(uname -r) is not installed; cannot build dw9719." >&2
+		exit 1
+	fi
+
+	# Older builds of this package. Removal deletes the on-disk modules
+	# and puts the archived originals back. It does not unload a driver
+	# that is already in memory.
+	if dkms status -m "$NAME" 2>/dev/null | grep -q .; then
+		dkms status -m "$NAME" 2>/dev/null \
+			| sed -n 's|^.*/\([^,]*\).*|\1|p' \
+			| sort -u \
+			| while read -r old; do
+				if [ "$old" != "$VERSION" ]; then
+					dkms remove -m "$NAME" -v "$old" --all || true
+				fi
+			done
+	fi
+
+	if ! dkms status -m "$NAME" -v "$VERSION" 2>/dev/null | grep -q .; then
+		dkms add -m "$NAME" -v "$VERSION"
+	fi
+	dkms install -m "$NAME" -v "$VERSION" -k "$(uname -r)" --force
+	depmod -a "$(uname -r)"
+
+	if [ -x /etc/kernel/postinst.d/sign-ipu3-imgu ]; then
+		/etc/kernel/postinst.d/sign-ipu3-imgu "$(uname -r)" || true
+	fi
+
+	# Load the fixed drivers when they are not already resident.
+	# modprobe of a resident module does not reload it, and this
+	# script never removes a module.
+	if ! err=$(modprobe dw9719 2>&1); then
+		echo "dw9719 did not load: $err" >&2
+		echo "If Secure Boot is on, enroll the module key and reboot." >&2
+	fi
+	if ! err=$(modprobe ov8865 2>&1); then
+		echo "ov8865 did not load: $err" >&2
+	fi
+	modprobe ov5693 2>/dev/null || true
+	modprobe ipu3_cio2 2>/dev/null || true
+	if [ -e /sys/bus/i2c/devices/i2c-INT347A:00-VCM ] &&
+	   [ ! -L /sys/bus/i2c/devices/i2c-INT347A:00-VCM/driver ]; then
+		echo i2c-INT347A:00-VCM > /sys/bus/i2c/drivers/dw9719/bind 2>/dev/null || true
+	fi
+fi
+
+exit 0

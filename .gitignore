@@ -1,0 +1,15 @@
+*.o
+*.ko
+*.ko.zst
+*.ko.xz
+*.mod
+*.mod.c
+*.mod.o
+*.so
+*.cmd
+*.d
+.*.cmd
+*.deb
+Module.symvers
+modules.order
+.cache/

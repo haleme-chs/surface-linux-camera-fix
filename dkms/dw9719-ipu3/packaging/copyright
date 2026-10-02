@@ -1,0 +1,30 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: dw9719-ipu3
+Source: https://github.com/haleme-chs/surface-linux-camera-fix
+
+Files: *
+Copyright: 2026 Matthew Hale
+License: GPL-3.0-only
+ The packaging and the ipu3-imgu signing hook are released under the
+ GNU General Public License, version 3 only. The full text is the
+ LICENSE file in the source repository.
+
+Files: dw9719.c
+Copyright: 2012 Intel Corporation
+License: GPL-2.0-only
+ On Debian systems the full text of the GPL version 2 is in
+ /usr/share/common-licenses/GPL-2.
+
+Files: ov8865.c
+Copyright: 2020 Kévin L'hôpital
+           2020 Bootlin
+           2020 Paul Kocialkowski
+License: GPL-2.0-or-later
+
+Files: ov8865.yaml
+Copyright: 2026 Matthew Hale
+License: CC0-1.0
+ The person who associated a work with this deed has dedicated the work
+ to the public domain by waiving all rights to the work worldwide under
+ copyright law, including all related and neighboring rights, to the
+ extent allowed by law.

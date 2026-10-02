@@ -1,0 +1,13 @@
+#!/bin/sh
+set -e
+
+NAME=dw9719-ipu3
+VERSION=1.4
+
+if [ "$1" = remove ] || [ "$1" = upgrade ] || [ "$1" = deconfigure ]; then
+	# Deletes the on-disk modules only. A loaded camera driver stays
+	# resident until the next reboot.
+	dkms remove -m "$NAME" -v "$VERSION" --all || true
+fi
+
+exit 0

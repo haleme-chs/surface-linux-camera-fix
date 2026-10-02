@@ -1,0 +1,20 @@
+Package: dw9719-ipu3-dkms
+Version: 1.4
+Section: kernel
+Priority: optional
+Architecture: all
+Depends: dkms, build-essential, sbsigntool, zstd
+Maintainer: Matthew Hale <matthew-hale@localhost>
+Description: Surface IPU3 camera drivers for the focus motor and rear sensor
+ Ubuntu 7.0 dropped the I2C device id table from the dw9719 lens driver.
+ The Surface focus motor is a plain I2C device, so the driver never binds.
+ That unfinished link blocks every camera, and libcamera lists none.
+ .
+ This package builds the upstream driver (commit d7fe0d53b2a8, which puts
+ the I2C id table back) and installs it ahead of the stock module. It also
+ programs the OV8865 rear sensor's mode registers when streaming starts,
+ then writes exposure and gain again. Without the mode program, the rear
+ camera sends a full-size frame into a smaller buffer, delivers one
+ picture, and then stalls. DKMS rebuilds both modules when a new kernel
+ is installed. Secure Boot must trust the local module key or the
+ modules will not load.

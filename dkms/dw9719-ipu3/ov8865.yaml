@@ -1,0 +1,13 @@
+# SPDX-License-Identifier: CC0-1.0
+# Rear OV8865 on the Surface Go 2.
+# The IPU3 autofocus loop drives the lens and was leaving this picture soft,
+# so it is left out. Exposure stays on the uncalibrated target.
+%YAML 1.1
+---
+version: 1
+algorithms:
+  - Agc:
+  - Awb:
+  - BlackLevelCorrection:
+  - ToneMapping:
+...
