@@ -20,6 +20,8 @@ The script installs the build dependencies, builds a DKMS package, builds the Pi
 
 If `install.sh` reports that a loaded module is an older build, reboot when you can. The running driver stays in place until then.
 
+The script adds the account that ran `sudo` to the `video` group when that account is not already a member. PipeWire opens `/dev/media*` as the graphical session starts. Ubuntu attaches the same access through a session permission a moment later, and PipeWire does not open the devices again if the first attempt is refused. Membership in `video` is already present at login, so the cameras stay visible after a restart. The new membership takes effect at the next login. The PipeWire restart at the end of `install.sh` covers the current session.
+
 ## Secure Boot
 
 Ubuntu ships `ipu3-imgu` unsigned. With Secure Boot on, the kernel rejects that module and libcamera lists no cameras. DKMS signs `dw9719` and `ov8865` with the local Machine Owner Key. The install hook signs `ipu3-imgu` with the same key.
@@ -83,7 +85,7 @@ Leave `ipu3_cio2`, `ipu3_imgu`, `ov5693`, `ov8865`, and `dw9719` loaded. Unloadi
 sudo bash uninstall.sh
 ```
 
-Then reboot. That restores the distribution PipeWire plugin and removes the DKMS package. The config file stays until:
+Then reboot. That restores the distribution PipeWire plugin and removes the DKMS package. Membership in the `video` group stays. The config file stays until:
 
 ```sh
 sudo dpkg --purge dw9719-ipu3-dkms

@@ -143,5 +143,17 @@ if [[ "$need_reboot" -eq 1 ]]; then
 	echo "Reboot when you can. The running camera drivers stay loaded until then."
 fi
 
+# Group membership is present when the graphical session starts. The
+# session permission on /dev/media* is attached a moment later, and
+# PipeWire does not retry if that first open is refused.
+if [[ -n "${SUDO_USER:-}" && "${SUDO_USER}" != root ]]; then
+	if ! id -nG "${SUDO_USER}" | tr ' ' '\n' | grep -qx video; then
+		usermod -aG video "${SUDO_USER}"
+		echo "Added ${SUDO_USER} to the video group. It takes effect at the next login."
+	fi
+else
+	echo "Run this script with sudo from the desktop account so that account can be added to the video group." >&2
+fi
+
 restart_user_pipewire
 echo "Done. Open the Camera app and check both cameras."
